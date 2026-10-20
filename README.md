@@ -146,3 +146,12 @@ All 100 lessons share bilingual data and a method-oriented renderer. Each approa
 - 修改正文后运行 `node build-seo.cjs`；Fork 后使用 `node build-seo.cjs https://你的用户名.github.io/仓库名/` 重新生成站点 URL。
 - 运行 `node test-seo.cjs`、`node test-handbook.cjs`、`node test-i18n.cjs` 验证。
 - 搜索引擎所有权验证与站点地图提交步骤见 [SEARCH-SETUP.md](SEARCH-SETUP.md)。发布 sitemap 不等于已提交或已收录。
+
+## AI Agent 面试题 / Interview handbook
+
+- [中文详解](https://leftagent.github.io/agent-fieldnotes/interview.html) · [English](https://leftagent.github.io/agent-fieldnotes/interview-en.html)
+- 96 道原创详解，12 个模块：模型基础、架构、提示、RAG、工具、记忆、规划、多 Agent、评测、安全、部署、项目与手写题。
+- 每题包含核心回答、原理与实现、工程例子、追问、易错点和参考链接；支持全文搜索、模块筛选、单题链接和浏览器本地进度。
+- 主题参考 [Agent-Interview-100](https://github.com/BigKunLun/Agent-Interview-100) 与 [kaomian](https://github.com/smile-struggler/kaomian)，解释独立编写，不代表原作者或官方答案。
+- 内容源：`interview-data.json`；生成中英文静态全文页面：`python build-interview.py`。无需服务端、API 密钥或登录。
+- 验证：`python test-interview.py` 与 `node test-seo.cjs`。

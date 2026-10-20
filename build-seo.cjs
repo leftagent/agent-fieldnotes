@@ -1,6 +1,6 @@
 /* node build-seo.cjs [https://owner.github.io/repository/] — Node 18+, no dependencies. */
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const root=__dirname,base=(process.argv[2]||'https://aidify2025.github.io/agent-fieldnotes/').replace(/\/?$/,'/');
+const root=__dirname,base=(process.argv[2]||'https://leftagent.github.io/agent-fieldnotes/').replace(/\/?$/,'/');
 if(!/^https:\/\//.test(base))throw Error('Use the public HTTPS site root.');
 const read=n=>fs.readFileSync(path.join(root,n),'utf8'),write=(n,s)=>fs.writeFileSync(path.join(root,n),s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -36,6 +36,6 @@ for(const lang of ['zh','en']){
   write(name,h);
  }
 }
-const urls=['index','practice','hot100',...topics.map(t=>t.slug)].flatMap(slug=>['zh','en'].map(lang=>base+file(slug,lang)));
+const urls=['index','practice','hot100','interview',...topics.map(t=>t.slug)].flatMap(slug=>['zh','en'].map(lang=>base+file(slug,lang)));
 write('sitemap.xml','<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+urls.map(u=>`  <url><loc>${esc(u)}</loc></url>`).join('\n')+'\n</urlset>\n');
-console.log('Generated 8 full-text tutorial pages, 14 sitemap URLs and bilingual metadata.');
+console.log('Generated 8 full-text tutorial pages, 16 sitemap URLs and bilingual metadata.');

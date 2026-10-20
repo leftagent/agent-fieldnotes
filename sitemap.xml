@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/index.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/index-en.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/practice.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/practice-en.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/hot100.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/hot100-en.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/agent-loop.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/agent-loop-en.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/mcp-tutorial.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/mcp-tutorial-en.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/hitl-checkpoint.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/hitl-checkpoint-en.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/langgraph-tutorial.html</loc></url>
-  <url><loc>https://aidify2025.github.io/agent-fieldnotes/langgraph-tutorial-en.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/index.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/index-en.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/practice.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/practice-en.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/hot100.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/hot100-en.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/agent-loop.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/agent-loop-en.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/mcp-tutorial.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/mcp-tutorial-en.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/hitl-checkpoint.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/hitl-checkpoint-en.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/langgraph-tutorial.html</loc></url>
+  <url><loc>https://leftagent.github.io/agent-fieldnotes/langgraph-tutorial-en.html</loc></url>
+<url><loc>https://leftagent.github.io/agent-fieldnotes/interview.html</loc></url>
+<url><loc>https://leftagent.github.io/agent-fieldnotes/interview-en.html</loc></url>
 </urlset>
