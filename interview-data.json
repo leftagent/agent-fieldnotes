@@ -1304,7 +1304,263 @@
     },
     "sources": [
       "https://github.com/smile-struggler/kaomian/blob/main/%E9%A2%98%E5%BA%93/02_%E7%9F%A5%E8%AF%86%E9%97%AE%E7%AD%94%E9%A2%98.md"
-    ]
+    ],
+    "tutorial": {
+      "zh": {
+        "intro": "注意力做的事情是：理解一个词时，从其他词里挑选有用的信息，按重要程度融合进来。",
+        "sections": [
+          {
+            "title": "先理解：为什么需要上下文？",
+            "paragraphs": [
+              "例如：“小明把苹果放进书包，因为它太重了。”",
+              "“它”指的是苹果，还是书包？只看“它”这一个字，无法判断。需要结合前面的内容。注意力机制可以让“它”这个位置去读取“小明”“苹果”“书包”等位置的信息，并给它们分配不同的权重。",
+              "这句话本身存在歧义，注意力也不能保证一定判断正确。这里用它说明：模型理解一个位置时，需要参考上下文。"
+            ]
+          },
+          {
+            "title": "1. 为什么要给不同词分配权重？",
+            "paragraphs": [
+              "因为上下文里的信息并不是同等重要。例如：“小明正在吃苹果。”理解“吃”时，“小明”提供谁在吃的信息，“苹果”提供吃什么的信息，“正在”提供时间状态。",
+              "注意力会计算一组权重，例如下面这组教学示意数字。这不是模型实际计算的结果。权重越大，说明该位置的信息在本次融合中占比越高。注意力也可以参考当前位置自身，所以表里包含“吃”。"
+            ],
+            "table": {
+              "headers": [
+                "被参考的位置",
+                "假设分配的权重"
+              ],
+              "rows": [
+                [
+                  "小明",
+                  "0.3"
+                ],
+                [
+                  "正在",
+                  "0.1"
+                ],
+                [
+                  "吃",
+                  "0.1"
+                ],
+                [
+                  "苹果",
+                  "0.5"
+                ]
+              ]
+            }
+          },
+          {
+            "title": "2. 模型怎么读取这些信息？",
+            "paragraphs": [
+              "模型处理的不是文字本身，而是表示文字的数字向量。你可以先把向量理解成“一组数字”。这组数字编码了模型学到的特征，并不是人为规定第一位表示水果、第二位表示颜色。",
+              "为了看清计算过程，假设只有两个位置参与融合。位置 A 提供的信息是 [2, 0]，位置 B 提供的信息是 [0, 4]；它们的权重分别是 0.75 和 0.25。",
+              "下面就是注意力最核心的计算：加权求和。它的输出通常不是“苹果”这样的文字，而是一个新的向量。这个向量融合了上下文信息，供后续网络继续处理。"
+            ],
+            "calculation": "0.75 × [2, 0] + 0.25 × [0, 4]\n= [1.5, 0] + [0, 1]\n= [1.5, 1]"
+          },
+          {
+            "title": "3. 那 Q、K、V 到底是什么？",
+            "paragraphs": [
+              "刚才我们直接给出了权重，但真正的模型还要解决一个问题：应该根据什么，决定各个位置的权重？这就用到了 Q、K、V。",
+              "可以类比你去图书馆查资料：Q 是你提出的问题，K 是用来判断书籍是否相关的检索特征，V 是最后从相关书籍中读取的信息。这个类比只是帮助理解，在模型里它们都是数字向量。",
+              "Q 和 K 负责决定“关注多少”，V 负责提供“融合什么”。"
+            ],
+            "table": {
+              "headers": [
+                "名称",
+                "可以先这样理解",
+                "作用"
+              ],
+              "rows": [
+                [
+                  "Q：Query，查询",
+                  "我现在想找什么信息",
+                  "与其他位置进行匹配"
+                ],
+                [
+                  "K：Key，键",
+                  "我这里有什么特征，可以被匹配",
+                  "与 Q 一起计算匹配分数"
+                ],
+                [
+                  "V：Value，值",
+                  "我实际提供什么信息",
+                  "按权重参与融合"
+                ]
+              ]
+            }
+          },
+          {
+            "title": "4. Q、K、V 是谁给的？",
+            "paragraphs": [
+              "它们是由输入向量经过三组不同的线性变换得到的。也就是说，同一个位置的输入分别乘以三组参数矩阵，得到 Q、K、V。",
+              "这些变换的参数是模型在训练中学出来的，并不是程序员逐个指定的。在自注意力里，同一批输入会生成 Q、K、V，因此一个位置既可以主动查询其他位置，也可以被其他位置参考。"
+            ],
+            "calculation": "输入向量 X → 变换 WQ → Q\n输入向量 X → 变换 WK → K\n输入向量 X → 变换 WV → V"
+          },
+          {
+            "title": "5. 一次注意力计算的完整过程",
+            "paragraphs": [
+              "以当前某个位置为例，依次做下面四件事。这里的“匹配程度”是模型学到的数值关系，不等同于人理解的两个词在语义上有多相似。"
+            ],
+            "steps": [
+              "拿到自己的 Q：表示当前位置用于匹配信息的查询特征。",
+              "用 Q 与可见位置的 K 计算分数：得到各个位置与当前查询的匹配程度。",
+              "把分数转换成权重：通常经过缩放，再使用 Softmax，让权重非负、加起来等于 1。",
+              "用权重对各位置的 V 加权求和：得到融合了上下文的新向量。"
+            ]
+          },
+          {
+            "title": "6. 为什么还要“缩放”和“遮罩”？",
+            "paragraphs": [
+              "缩放是为了让计算更稳定。Q 和 K 通过点积计算分数；向量维度较大时，分数的数值尺度可能变大，使 Softmax 的权重过于集中，不利于训练。因此通常会除以 √dₖ，其中 dₖ 是 Q、K 的维度。",
+              "遮罩是为了控制哪些位置可以被参考。例如，自回归模型训练“根据前文预测后文”时，不能提前看到未来位置的内容。因果遮罩会把这些位置屏蔽掉，使它们得到的注意力权重为 0。"
+            ]
+          },
+          {
+            "title": "7. 多头注意力是什么？",
+            "paragraphs": [
+              "可以理解为：同时用多组不同的 Q、K、V 变换，从不同角度提取上下文信息。各个头分别计算注意力，再把结果拼接并变换，得到最终输出。",
+              "不同头可以学到不同关系，但不能简单规定“第一个头一定看语法，第二个头一定看语义”。这些关系是训练得到的，不一定有清晰、固定的人类解释。"
+            ]
+          }
+        ],
+        "interview": [
+          "Transformer 中的注意力，本质上是根据查询与键的匹配程度，对值向量进行加权聚合，从而得到融合上下文信息的表示。",
+          "在自注意力中，输入 X 通过三个可学习的线性投影生成 Q、K、V。先计算 QKᵀ，得到各位置之间的匹配分数；再除以 √dₖ 控制数值尺度，按需要加入 Mask，并通过 Softmax 得到注意力权重；最后用这些权重对 V 加权求和。",
+          "其中，M 用于屏蔽不允许关注的位置，例如自回归生成中的未来位置。允许关注的位置对应 0，被屏蔽的位置对应负无穷；Softmax 沿被参考位置的方向计算。",
+          "Q、K 决定信息的聚合权重，V 提供被聚合的内容。多头注意力则在不同的投影子空间中分别计算，再拼接并投影，使模型能够同时建模多种上下文关系。最终输出是上下文相关的向量表示，而不是直接输出文字。"
+        ],
+        "memory": "当前想获取什么信息 → 与哪些位置匹配 → 分配权重 → 融合这些位置提供的信息。",
+        "sourceNote": "题目主题来自 kaomian《知识问答题》第 18 题“Transformer 中 Attention 的本质是什么？你能从数学角度简要解释一下吗？”。本页的小白讲解、示例和面试回答为本站独立编写。"
+      },
+      "en": {
+        "intro": "Attention combines information from other positions with different weights, helping a model understand a word in context.",
+        "sections": [
+          {
+            "title": "Start here: why does context matter?",
+            "paragraphs": [
+              "Consider: “Alex put the apple in the bag because it was too heavy.”",
+              "Does “it” refer to the apple or the bag? The word alone cannot tell us. Attention lets that position read information from positions such as “Alex”, “apple” and “bag”, assigning different weights to them.",
+              "The sentence is genuinely ambiguous; attention does not guarantee a correct interpretation. It illustrates why understanding a position requires context."
+            ]
+          },
+          {
+            "title": "1. Why assign different weights?",
+            "paragraphs": [
+              "Context does not contribute equally. In “Alex is eating an apple”, Alex tells us who is eating, apple tells us what is being eaten, and the surrounding wording supplies other context.",
+              "The following weights are invented teaching numbers, not measurements from a model. A larger weight means a position contributes more to this particular mixture. A position can also attend to itself."
+            ],
+            "table": {
+              "headers": [
+                "Position being read",
+                "Illustrative weight"
+              ],
+              "rows": [
+                [
+                  "Alex",
+                  "0.3"
+                ],
+                [
+                  "is",
+                  "0.1"
+                ],
+                [
+                  "eating",
+                  "0.1"
+                ],
+                [
+                  "apple",
+                  "0.5"
+                ]
+              ]
+            }
+          },
+          {
+            "title": "2. What information does the model actually read?",
+            "paragraphs": [
+              "The model works with numerical vectors representing text. Think of a vector as a list of numbers encoding learned features, not a hand-written list where the first number means fruit and the second means color.",
+              "For a tiny example, let position A supply [2, 0] and position B supply [0, 4], with weights 0.75 and 0.25.",
+              "The calculation below is the central operation: a weighted sum. The output is a new vector, usually not a word such as “apple”. It combines contextual information for later network layers."
+            ],
+            "calculation": "0.75 × [2, 0] + 0.25 × [0, 4]\n= [1.5, 0] + [0, 1]\n= [1.5, 1]"
+          },
+          {
+            "title": "3. What are Q, K and V?",
+            "paragraphs": [
+              "We have assigned weights by hand so far. A real model must determine those weights. That is where Q, K and V enter.",
+              "Imagine searching a library: Q is your question, K represents the search features used to identify relevant books, and V is the information you read from them. This is only an analogy; in a model, all three are numerical vectors.",
+              "Q and K determine how much to attend; V supplies what gets combined."
+            ],
+            "table": {
+              "headers": [
+                "Name",
+                "Intuition",
+                "Role"
+              ],
+              "rows": [
+                [
+                  "Q: Query",
+                  "What information am I seeking?",
+                  "Matches other positions"
+                ],
+                [
+                  "K: Key",
+                  "What features can match a query?",
+                  "Forms matching scores with Q"
+                ],
+                [
+                  "V: Value",
+                  "What information do I contribute?",
+                  "Participates in the weighted sum"
+                ]
+              ]
+            }
+          },
+          {
+            "title": "4. Where do Q, K and V come from?",
+            "paragraphs": [
+              "The input vector undergoes three different learned linear transformations. Multiplying the same input by three parameter matrices produces Q, K and V.",
+              "These transformation parameters are learned during training, not assigned individually by a programmer. In self-attention, the same input sequence produces all three, so a position can query other positions and also be read by them."
+            ],
+            "calculation": "Input X → projection WQ → Q\nInput X → projection WK → K\nInput X → projection WV → V"
+          },
+          {
+            "title": "5. What happens in one attention calculation?",
+            "paragraphs": [
+              "For one current position, follow these four steps. The matching score is a learned numerical relationship, not necessarily the human notion of semantic similarity."
+            ],
+            "steps": [
+              "Take the current position’s Q, representing its query features.",
+              "Score Q against the keys K of visible positions.",
+              "Scale the scores and apply Softmax to obtain nonnegative weights summing to one.",
+              "Compute the weighted sum of those positions’ V vectors, producing a context-aware representation."
+            ]
+          },
+          {
+            "title": "6. Why scaling and masking?",
+            "paragraphs": [
+              "Scaling helps numerical stability. Q and K form scores through dot products. At larger dimensions their scale can grow, making Softmax overly concentrated and training more difficult. Dividing by √dₖ controls this scale, where dₖ is the dimension of Q and K.",
+              "Masking controls which positions may be read. During autoregressive training, the model must predict later text from earlier text without seeing future positions. A causal mask assigns those future positions zero attention weight."
+            ]
+          },
+          {
+            "title": "7. What is multi-head attention?",
+            "paragraphs": [
+              "Several different Q, K and V projections extract contextual information in parallel. Each head computes attention, then the outputs are concatenated and projected.",
+              "Heads can learn different relationships, but we cannot promise that one always handles grammar and another always handles meaning. Their learned behavior need not have a fixed human-readable interpretation."
+            ]
+          }
+        ],
+        "interview": [
+          "Transformer attention is a weighted aggregation of value vectors, with weights determined by query–key matching. It produces a representation incorporating context.",
+          "In self-attention, three learned linear projections map input X to Q, K and V. QKᵀ produces matching scores, division by √dₖ controls their numerical scale, an optional mask restricts visibility, and Softmax converts scores into weights. These weights aggregate V.",
+          "M masks disallowed positions, such as future positions in autoregressive generation. Allowed positions receive 0 and masked positions receive negative infinity. Softmax operates over the positions being attended to.",
+          "Q and K determine aggregation weights; V supplies the content. Multi-head attention performs this operation in different projection subspaces, then concatenates and projects the outputs to model multiple contextual relationships. Its output is a context-dependent vector representation, not directly a word."
+        ],
+        "memory": "What information is needed → which positions match → assign weights → combine the information they supply.",
+        "sourceNote": "The topic comes from question 18 in kaomian’s knowledge Q&A list, asking about the essence and mathematics of Transformer attention. The beginner explanation, examples and interview answer on this page are independently written."
+      }
+    }
   },
   {
     "id": "found-02",

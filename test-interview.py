@@ -28,6 +28,15 @@ for lang,suffix in [('zh',''),('en','-en')]:
  assert len(re.findall('<article class="answer"',text))==96
  visible=unescape(re.sub('<[^>]*>',' ',text))
  for q in data:
+  if q.get('tutorial'):
+   tutorial=q['tutorial'][lang]
+   assert tutorial['intro'] in visible
+   for block in tutorial['sections']:
+    assert block['title'] in visible
+    for paragraph in block['paragraphs']:assert paragraph in visible
+   for paragraph in tutorial['interview']:assert paragraph in visible
+   assert 'softmax(QKᵀ / √dₖ + M)V' in visible
+   continue
   for field in ['title','summary','example','followup','pitfall']:
    assert q[field][lang] in visible,(q['id'],field)
   for p in q['reasoning'][lang]:assert p in visible

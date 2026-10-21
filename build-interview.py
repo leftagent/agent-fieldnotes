@@ -28,11 +28,24 @@ for lang in ['zh','en']:
   if q.get('code'):
    code=f'<section><h3>{t("代码示例","Code example")}</h3><div class="code-head"><span>{h(q["code"]["language"])}</span><button class="copy-code" type="button">{t("复制代码","Copy code")}</button></div><pre><code>{h(q["code"]["text"])}</code></pre></section>'
   sections=''.join(f'<section class="{key}"><h3>{label}</h3><p>{h(q[key][lang])}</p></section>' for key,label in [('example',t('工程例子','Engineering example')),('followup',t('面试追问','Follow-up')),('pitfall',t('易错点','Common pitfall'))])
+  body=f'<section class="core"><h3>{t("核心回答","Core answer")}</h3><p>{h(q["summary"][lang])}</p></section><section><h3>{t("原理与实现","Reasoning & implementation")}</h3><ol class="reasoning">{reasoning}</ol></section>{sections}{code}'
+  if q.get('tutorial'):
+   tutorial=q['tutorial'][lang]
+   blocks=[]
+   for block in tutorial['sections']:
+    content=''.join(f'<p>{h(p)}</p>' for p in block['paragraphs'])
+    if block.get('table'):
+     tab=block['table']; heads=''.join(f'<th scope="col">{h(x)}</th>' for x in tab['headers']);rows=''.join('<tr>'+''.join(f'<td>{h(x)}</td>' for x in row)+'</tr>' for row in tab['rows'])
+     content+=f'<div class="lesson-table"><table><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></div>'
+    if block.get('calculation'):content+=f'<pre class="calculation">{h(block["calculation"])}</pre>'
+    if block.get('steps'):content+='<ol class="reasoning">'+''.join(f'<li><p>{h(x)}</p></li>' for x in block['steps'])+'</ol>'
+    blocks.append(f'<section class="beginner-block"><h4>{h(block["title"])}</h4>{content}</section>')
+   professional=''.join(f'<p>{h(p)}</p>'+('<div class="attention-formula" role="math" aria-label="Attention of Q K V equals softmax of Q K transpose divided by square root of d k plus M, multiplied by V">Attention(Q, K, V) = softmax(QKᵀ / √dₖ + M)V</div>' if j==1 else '') for j,p in enumerate(tutorial['interview']))
+   body=f'<section class="beginner-lesson"><h3 class="lesson-heading">{t("一、小白版：注意力究竟在做什么？","Part 1 · Understand attention from scratch")}</h3><p class="lesson-intro">{h(tutorial["intro"])}</p>{"".join(blocks)}</section><section class="interview-standard"><h3 class="lesson-heading">{t("二、面试版：可以这样回答面试官","Part 2 · A professional interview answer")}</h3>{professional}</section><p class="memory-line">{h(tutorial["memory"])}</p><p class="source-note">{h(tutorial["sourceNote"])}</p>'
   articles.append(f'''<article class="answer" id="{qid}" data-category="{q['category']}" aria-labelledby="title-{qid}">
  <div class="answer-meta"><span>{i:02} / 96 · {h(names[q['category']])}</span><div class="answer-actions"><button class="copy-link" type="button">{t('复制链接','Copy link')}</button><button class="mark-read" type="button" aria-pressed="false">{t('标记掌握','Mark learned')}</button></div></div>
  <h2 id="title-{qid}" tabindex="-1">{h(title)}</h2>
- <section class="core"><h3>{t('核心回答','Core answer')}</h3><p>{h(q['summary'][lang])}</p></section>
- <section><h3>{t('原理与实现','Reasoning & implementation')}</h3><ol class="reasoning">{reasoning}</ol></section>{sections}{code}
+ {body}
  <section class="references"><h3>{t('延伸阅读','Further reading')}</h3>{sources}</section>
  <div class="question-pager"><a href="#{ordered[max(0,i-2)]['id']}" {'hidden' if i==1 else ''}>← {t('上一题','Previous')}</a><a href="#{ordered[min(95,i)]['id']}" {'hidden' if i==96 else ''}>{t('下一题','Next')} →</a></div></article>''')
  options=''.join(f'<option value="{c}">{h(names[c])} · 8</option>' for c,_,_ in CATEGORIES)
